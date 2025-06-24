@@ -1,0 +1,132 @@
+const express = require('express');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const fs = require('fs').promises;
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// Middleware
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/data', express.static(path.join(__dirname, 'data')));
+app.use(bodyParser.json());
+app.use(session({
+    secret: 'cromi-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Ensure data directory and files exist
+async function initializeDataFiles() {
+    const dataDir = path.join(__dirname, 'data');
+    const ordersFile = path.join(dataDir, 'orders.json');
+    const productsFile = path.join(dataDir, 'products.json');
+
+    try {
+        await fs.mkdir(dataDir, { recursive: true });
+        
+        // Initialize orders.json if it doesn't exist
+        try {
+            await fs.access(ordersFile);
+        } catch {
+            await fs.writeFile(ordersFile, '[]');
+        }
+
+        // Initialize products.json if it doesn't exist
+        try {
+            await fs.access(productsFile);
+        } catch {
+            await fs.writeFile(productsFile, '[]');
+        }
+    } catch (error) {
+        console.error('Error initializing data files:', error);
+    }
+}
+
+// Initialize data files on server start
+initializeDataFiles();
+
+// API Routes
+app.get('/api/products', async (req, res) => {
+    try {
+        const productsFile = path.join(__dirname, 'data', 'products.json');
+        const data = await fs.readFile(productsFile, 'utf8');
+        res.setHeader('Content-Type', 'application/json');
+        res.send(data);
+    } catch (error) {
+        console.error('Error serving products:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/order', async (req, res) => {
+    try {
+        const order = req.body;
+        const ordersFile = path.join(__dirname, 'data', 'orders.json');
+        
+        // Validate order data
+        if (!order.name || !order.email || !order.items || !order.items.length) {
+            return res.status(400).json({ error: 'Invalid order data' });
+        }
+
+        // Read existing orders
+        const orders = JSON.parse(await fs.readFile(ordersFile, 'utf8'));
+        
+        // Add new order with timestamp
+        orders.push({
+            ...order,
+            timestamp: new Date().toISOString()
+        });
+
+        // Save updated orders
+        await fs.writeFile(ordersFile, JSON.stringify(orders, null, 2));
+        
+        res.json({ success: true, message: 'Order placed successfully' });
+    } catch (error) {
+        console.error('Error processing order:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // Simple admin authentication (in production, use proper authentication)
+    if (username === 'admin' && password === 'admin123') {
+        req.session.isAdmin = true;
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ error: 'Invalid credentials' });
+    }
+});
+
+app.get('/api/orders', async (req, res) => {
+    if (!req.session.isAdmin) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        const ordersFile = path.join(__dirname, 'data', 'orders.json');
+        const orders = JSON.parse(await fs.readFile(ordersFile, 'utf8'));
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/logout', (req, res) => {
+    req.session.destroy();
+    res.json({ success: true });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something broke!' });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
