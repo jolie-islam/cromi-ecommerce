@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - CROMI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header/Navigation -->
+    <header class="fixed w-full bg-white shadow-sm z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-3xl font-bold text-black">CROMI</a>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="/" class="text-black hover:text-gray-600">Home</a>
+                    <a href="/collections.html" class="text-black hover:text-gray-600">Collections</a>
+                    <a href="/cart.html" class="text-black hover:text-gray-600 relative">
+                        Cart
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center rounded-full" style="display: none;">0</span>
+                    </a>
+                    <a href="/admin-login.html" class="text-black hover:text-gray-600">Admin</a>
+                </div>
+                <button class="md:hidden">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Cart Section -->
+    <div class="pt-24 pb-16">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold mb-8">Shopping Cart</h1>
+            
+            <!-- Cart Items -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div id="cartItems" class="space-y-4">
+                        <!-- Cart items will be loaded dynamically -->
+                    </div>
+                    
+                    <!-- Empty Cart Message -->
+                    <div id="emptyCartMessage" class="hidden text-center py-8">
+                        <p class="text-gray-500 mb-4">Your cart is empty</p>
+                        <a href="/collections.html" class="inline-block bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition duration-300">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between">
+                                <span>Subtotal</span>
+                                <span id="subtotal">EGP 0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shipping</span>
+                                <span>Free</span>
+                            </div>
+                            <div class="border-t pt-2 mt-2">
+                                <div class="flex justify-between font-bold">
+                                    <span>Total</span>
+                                    <span id="total">EGP 0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Form -->
+                        <form id="checkoutForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Full Name</label>
+                                <input type="text" name="name" required
+                                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Email</label>
+                                <input type="email" name="email" required
+                                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Phone</label>
+                                <input type="tel" name="phone" required
+                                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Address</label>
+                                <textarea name="address" required rows="3"
+                                          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"></textarea>
+                            </div>
+                            <button type="submit" 
+                                    class="w-full bg-black text-white py-3 rounded-full hover:bg-gray-800 transition duration-300">
+                                Place Order
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">CROMI</h3>
+                    <p class="text-gray-400">Modern Fashion Store</p>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="/collections.html" class="text-gray-400 hover:text-white">Collections</a></li>
+                        <li><a href="/cart.html" class="text-gray-400 hover:text-white">Cart</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Email: info@cromi.com</li>
+                        <li>Phone: +1 234 567 890</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 CROMI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Main JavaScript -->
+    <script src="/assets/js/main.js"></script>
+
+    <!-- Cart Page JavaScript -->
+    <script>
+        // Handle order submission
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const orderData = {
+                customer: {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    address: formData.get('address')
+                },
+                items: cart,
+                total: cart.reduce((total, item) => total + (item.price * item.quantity), 0)
+            };
+
+            try {
+                const response = await fetch('/api/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (response.ok) {
+                    // Clear cart and show success message
+                    cart = [];
+                    localStorage.removeItem('cart');
+                    alert('Order placed successfully!');
+                    window.location.href = '/';
+                } else {
+                    throw new Error('Failed to place order');
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                alert('Failed to place order. Please try again.');
+            }
+        });
+
+        // Initialize cart page
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCart();
+            renderCart();
+        });
+    </script>
+</body>
+</html>
