@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CROMI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header/Navigation -->
+    <header class="fixed w-full bg-white shadow-sm z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-3xl font-bold text-black">CROMI</a>
+                <div class="flex items-center space-x-4">
+                    <button id="logoutBtn" class="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition duration-300">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="pt-24 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold">Orders Dashboard</h1>
+                <button id="refreshBtn" class="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition duration-300">
+                    <i class="fas fa-sync-alt mr-2"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Orders List -->
+            <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-6">
+                    <div id="ordersContainer" class="space-y-6">
+                        <!-- Orders will be loaded here -->
+                        <div id="loadingMessage" class="text-center py-8">
+                            <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                            <p class="mt-2 text-gray-500">Loading orders...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication on page load
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/orders');
+                if (!response.ok) {
+                    window.location.href = '/admin-login.html';
+                }
+            } catch (error) {
+                window.location.href = '/admin-login.html';
+            }
+        }
+
+        // Load and display orders
+        async function loadOrders() {
+            const ordersContainer = document.getElementById('ordersContainer');
+            const loadingMessage = document.getElementById('loadingMessage');
+
+            try {
+                const response = await fetch('/api/orders');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch orders');
+                }
+
+                const orders = await response.json();
+
+                if (orders.length === 0) {
+                    ordersContainer.innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-gray-500">No orders found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                ordersContainer.innerHTML = orders.map((order, index) => `
+                    <div class="border-b last:border-b-0 pb-6 last:pb-0">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold">Order #${index + 1}</h3>
+                                <p class="text-sm text-gray-500">
+                                    ${new Date(order.timestamp).toLocaleString()}
+                                </p>
+                            </div>
+                            <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                                New Order
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-medium mb-2">Customer Details</h4>
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <p><strong>Name:</strong> ${order.customer.name}</p>
+                                    <p><strong>Email:</strong> ${order.customer.email}</p>
+                                    <p><strong>Phone:</strong> ${order.customer.phone}</p>
+                                    <p><strong>Address:</strong> ${order.customer.address}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="font-medium mb-2">Order Items</h4>
+                                <div class="space-y-2">
+                                    ${order.items.map(item => `
+                                        <div class="flex justify-between text-sm">
+                                            <span>${item.name} × ${item.quantity}</span>
+                                            <span>EGP ${(item.price * item.quantity).toFixed(2)}</span>
+                                        </div>
+                                    `).join('')}
+                                    <div class="border-t pt-2 mt-2">
+                                        <div class="flex justify-between font-bold">
+                                            <span>Total</span>
+                                            <span>EGP ${order.total.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                ordersContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-red-500">Failed to load orders. Please try again.</p>
+                    </div>
+                `;
+            } finally {
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/admin-login.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+
+        // Handle refresh
+        document.getElementById('refreshBtn').addEventListener('click', loadOrders);
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadOrders();
+        });
+    </script>
+</body>
+</html>
