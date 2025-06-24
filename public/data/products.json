@@ -1,0 +1,55 @@
+{
+  "categories": [
+    {
+      "id": "exotic",
+      "name": "Exotic line",
+      "image": "https://images.pexels.com/photos/994523/pexels-photo-994523.jpeg"
+    },
+    {
+      "id": "coverup",
+      "name": "Cover-up",
+      "image": "https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg"
+    },
+    {
+      "id": "dresses",
+      "name": "Dresses",
+      "image": "https://images.pexels.com/photos/1375736/pexels-photo-1375736.jpeg"
+    },
+    {
+      "id": "sets",
+      "name": "Sets",
+      "image": "https://images.pexels.com/photos/1007018/pexels-photo-1007018.jpeg"
+    },
+    {
+      "id": "accessories",
+      "name": "Accessories",
+      "image": "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg"
+    }
+  ],
+  "products": [
+    {
+      "id": "sample-product-1",
+      "name": "Sample Product 1",
+      "category": "exotic",
+      "price": 1875.00,
+      "description": "Beautiful handmade product with unique design",
+      "images": [
+        "https://images.pexels.com/photos/994523/pexels-photo-994523.jpeg",
+        "https://images.pexels.com/photos/994524/pexels-photo-994524.jpeg"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "sample-product-2",
+      "name": "Sample Product 2",
+      "category": "dresses",
+      "price": 1950.00,
+      "description": "Elegant dress with modern style",
+      "images": [
+        "https://images.pexels.com/photos/1375736/pexels-photo-1375736.jpeg",
+        "https://images.pexels.com/photos/1375737/pexels-photo-1375737.jpeg"
+      ],
+      "inStock": true
+    }
+  ]
+}
